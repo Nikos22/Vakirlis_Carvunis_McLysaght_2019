@@ -166,10 +166,6 @@ vert_df <- vert_gp_oo %>%
   mutate(div = vert_div_d[species, "Divergence_time"])
 
 
-##### prepare final dataframes to be loaded by next final script #####
-##### if we add a list of all genes then we can have everything in one master table
-##### and then manipulate it at will
-
 vert_gp_oo$tag <- "human"
 cer_gp_oo$tag <- "yeast"
 dros_gp_oo$tag <- "fruitfly"
@@ -246,7 +242,7 @@ write.csv(cer_synt_df, "scripts_submission/final_scripts/synt_simil_tables/yeast
 write.csv(dros_synt_df, "scripts_submission/final_scripts/synt_simil_tables/fruitfly_synteny_df.csv", row.names = FALSE)
 
 
-##### get the numbers to answer reviewer #2 comment #####
+#####
 
 
 species_to_get <- cer_div[which(cer_div$V2 >= 15), "species"]
