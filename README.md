@@ -1,5 +1,6 @@
 This repository contains all data to reproduce all figures and statistics of Vakirlis, Carvunis and McLysaht 2019 .
 
+The scripts can be inspected but cannot be used yet.
 
 Figure_3A1_data.csv : Data on undetectable homologies for different E-value cut-offs used to generate the top panel of Figure 3A.
 Column names: "total" : total number of genes in conserved micro-synteny, "not_found" : number of genes without significant sequence similarity, "div" : time since divergence from focal species
