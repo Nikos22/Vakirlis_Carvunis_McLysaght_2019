@@ -1,0 +1,17 @@
+Kazachstania_naganishii 85
+Naumovozyma_castellii 66
+Kluyveromyces_lactis 112
+Vanderwaltozyma_polyspora 93
+Lachancea_thermotolerans 112
+Naumovozyma_dairenensis 66
+Saccharomyces_arboricola 15
+Torulaspora_delbrueckii 97
+Eremothecium_cymbalariae 112
+Ashbya_aceri 112
+Candida_glabrata 97
+Tetrapisispora_blattae 93
+Zygosaccharomyces_rouxii 97
+Eremothecium_gossypii 112
+Saccharomyces_kudriavzevii 10
+Tetrapisispora_phaffii 93
+Kazachstania_africana 85

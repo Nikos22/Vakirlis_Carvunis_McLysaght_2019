@@ -1,0 +1,15 @@
+Anolis_carolinensis	312
+Bos_taurus	96
+Canis_familiaris	96
+Danio_rerio	435
+Felis_catus	96
+Gallus_gallus	312
+Gorilla_gorilla	9
+Latimeria_chalumnae	413
+Lepisosteus_oculatus	435
+Meleagris_gallopavo	312
+Pan_troglodytes	6.6
+Rattus_norvegicus	90
+Sus_scrofa	96
+Taeniopygia_guttata	312
+Mus_musculus	88

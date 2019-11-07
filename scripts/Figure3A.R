@@ -4,11 +4,11 @@ library(mltools)
 library(gridExtra)
 library(tidyr)
 
-setwd("~/Documents/research/ortho_buster/")
+setwd("~/Documents/research/Vakirlis_Carvunis_McLysaght_2019/")
 
 ################
 
-df <- read.csv("scripts_submission/final_scripts/fig3A1_table.csv")
+df <- read.csv("Figure_3-source_data_1.csv")
 df$tag <- factor(df$tag, levels=c("yeast", "fruitfly", "human"), ordered = TRUE)
 
 #
@@ -44,7 +44,7 @@ fn_pl = ggplot() +
 
 #####
 
-df <- read.csv("scripts_submission/final_scripts/fig3A2_table.csv")
+df <- read.csv("Figure_3-source_data_2.csv")
 df$tag <- factor(df$tag, levels=c("yeast", "fruitfly", "human"), ordered = TRUE)
 #
 df <- filter(df, species!="Caenorhabditis_elegans")
@@ -78,4 +78,4 @@ fp_pl = ggplot() +
 
 pl <- grid.arrange(fn_pl, fp_pl,  ncol=1, heights = c(2,2.4))
 
-ggsave(plot = pl, "scripts_submission/final_scripts/Figure3A.pdf", width=10, height = 10)
+ggsave(plot = pl, "figures/Figure3A.pdf", width=10, height = 10)

@@ -1,0 +1,11 @@
+"var","r","p","cor_sign"
+"Buried pct",0.668,0.00027,TRUE
+"CDS length",0.705,8e-05,TRUE
+"Coil pct",0.757,1e-05,TRUE
+"Exposed pct",0.766,1e-05,TRUE
+"GC pct",0.656,0.00037,TRUE
+"Helix pct",0.763,1e-05,TRUE
+"ISD pct",0.834,0,TRUE
+"LowComp pct",0.865,0,TRUE
+"Strand pct",0.723,4e-05,TRUE
+"TM pct",0.338,0.09798,FALSE
