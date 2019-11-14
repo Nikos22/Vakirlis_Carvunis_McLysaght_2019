@@ -744,24 +744,17 @@ dros_dnds$dS <- as.numeric(as.character(dros_dnds$dS))
 df_all <- bind_rows(cer_dnds, vert_dnds, dros_dnds)
 df_all$tag <- factor(df_all$tag, levels=c("yeast", "fruitfly", "human"), ordered = TRUE)
 
-df_all$dNdS <- round(df_all$dN/df_all$dS,4)
-
-df_all <- filter(df_all, dNdS != Inf)
-
 write.csv(df_all, file="Figure_5_source_data_1.csv", row.names = FALSE)
-colnames(df_all) <- c("Gene_name","dN","dS","inTrip","tag","dNdS")
+colnames(df_all) <- c("Gene_name","dN","dS","inTrip","tag")
 
 dnds_stats <- df_all %>%
   group_by(tag) %>%
   summarise(dn_pval = wilcox.test(dN~inTrip)$p.value,
-            ds_pval = wilcox.test(dS~inTrip)$p.value,
-            dnds_pval = wilcox.test(dNdS~inTrip)$p.value,
+            ds_pval = wilcox.test(dS~inTrip)$p.value,            
             dn_es = abs(qnorm(dn_pval/2))/sqrt(n()),
             ds_es = abs(qnorm(ds_pval/2))/sqrt(n()),
-            dnds_es = abs(qnorm(dnds_pval/2))/sqrt(n()),
             dn_Cliff = cliff.delta(dN, inTrip)$estimate,
-            ds_Cliff = cliff.delta(dS, inTrip)$estimate,
-            dnds_Cliff = cliff.delta(dNdS, inTrip)$estimate,
+            ds_Cliff = cliff.delta(dS, inTrip)$estimate,            
             N = n())
 
 
@@ -769,7 +762,6 @@ write.csv(dnds_stats, file="Figure5B.csv", row.names = FALSE)
 
 
 df_all_d <- df_all %>%
-  select(-dNdS) %>%
   filter(dN<0.5 & ((dS<0.5 & tag=="fruitfly") | (dS<2 & tag %in% c("human", "yeast")))) %>%
   gather(variable, value, dN, dS)
 
