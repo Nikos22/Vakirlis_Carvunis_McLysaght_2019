@@ -18,14 +18,16 @@ Column names: "micro-synteny" : whether the gene satisfies our conserved micro-s
 
 Figure_6-source_data_1.xls : An excel file with one dataset per sheet, containing the similarity and micro-synteny conservation information for every focal - target species comparison. The tables can also be found separately in text format in the synt_simil_tables/ folder.
 
-Figure_7_source_data_1.csv : Data on common Pfam matches and gene/protein properties used to generate Figure 5.
+Figure_7_source_data_1.csv : Data on common Pfam matches and gene/protein properties used to generate Figure 7.
 Column names: "Gene_focal" : Name of the focal species gene, "Gene_ortho" : name of the target species gene, "same" : whether a common Pfam match was found or these genes are in the same OrthoDB group, "focal" : the value for the property in the focal gene, "ortho" : the value for the property in the target species gene, "var" : the name of the property
+
+Figure_8_source_data_1.csv : CDS/protein properties for all undetectable homologue pairs, partially redundant with Figure_7_source_data_1.csv.  
 
 The table figure supplements are also provided here, details can be found in the article supplementary material.
 
 Furthermore, we provide some additional/raw data used by the scripts:
 
-all_gene_pairs/ : Data (for each dataset separately and combined in one file) for pairs of undetectable homologues used to calculate correlations after removal of pairs with high percentage of low complexity.
+all_gene_pairs/ : Data (for each dataset separately) for pairs of undetectable homologues used to calculate correlations after removal of pairs with high percentage of low complexity.
 Column names should be self-explanatory.
 
 Pfam_search_raw_data/ : PfamScan search output files for focal and target species proteins of interest.
