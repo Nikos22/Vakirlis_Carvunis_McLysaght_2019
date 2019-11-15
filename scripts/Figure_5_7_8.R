@@ -31,9 +31,6 @@ dros_gp_tbl <- read.csv("all_gene_pairs/dros_genePairs_df.csv",
                        as.is=TRUE,
                        stringsAsFactors = FALSE)
 
-#
-dros_gp_tbl <- filter(dros_gp_tbl, species!="Caenorhabditis_elegans")
-#
 
 vert_gp_tbl <- read.csv("all_gene_pairs/vert_genePairs_df.csv",
                         as.is=TRUE,
@@ -100,8 +97,7 @@ dros_gp_tbl <- dros_gp_tbl  %>%
 dros_gp_tbl <- as.data.frame(dros_gp_tbl)
 
 cer_gp_tbl <- cer_gp_tbl  %>%
-  filter(!(lc_ortho>50 & lc_focal>50)) %>%
-  filter(Gene_focal != "BSC4")
+  filter(!(lc_ortho>50 & lc_focal>50))
 
 cer_gp_tbl <- as.data.frame(cer_gp_tbl)
 
@@ -781,4 +777,4 @@ dens_dn_ds <- ggplot() +
         legend.position = "bottom") +
   facet_wrap(variable~tag, scales = "free")
 
-ggsave(plot = dens_dn_ds, "figures/Figure5A.pdf")
+ggsave(plot = dens_dn_ds, "figures/Figure5A.pdf", width=7.5, height=5.5)
