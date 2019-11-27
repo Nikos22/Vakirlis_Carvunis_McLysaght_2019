@@ -571,6 +571,9 @@ vert_keep <- c()
 all_species_check <- c()
 
 specOutput <- data.frame(found=character(), notFound=character())
+
+### these genes have been previously found to have matches outside of placental mammals, based on the NCBI NR protein similarity searches,
+## and therefore must be removed
 vert_to_remove <- c("C6orf222", "CCDC195", "CCDC7", "FMR1NB", "GVQW2", "MMP24OS", "SLC51B", "SMLR1", "TAC4", "TEX29", "GAGE12B", "SUPT16H", "PROSER3")
 
 for (gene in unique(vert_gp_tbl$Gene_focal))
@@ -756,7 +759,7 @@ dnds_stats <- df_all %>%
 
 write.csv(dnds_stats, file="Figure5B.csv", row.names = FALSE)
 
-
+### this filtering is done to facilitate visual comparison of distributions
 df_all_d <- df_all %>%
   filter(dN<0.5 & ((dS<0.5 & tag=="fruitfly") | (dS<2 & tag %in% c("human", "yeast")))) %>%
   gather(variable, value, dN, dS)
