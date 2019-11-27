@@ -8,7 +8,9 @@ setwd("~/Documents/research/Vakirlis_Carvunis_McLysaght_2019/")
 
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
-
+#
+# load data
+#
 
 df_fn <- read.csv("Figure_3-source_data_1.csv")
 df_fn$tag <- factor(df_fn$tag, levels=c("yeast", "fruitfly", "human"), ordered = TRUE)
@@ -34,7 +36,9 @@ cer_fp_df_tbl <- filter(df_fp, tag=="yeast")
 dros_fp_df_tbl <- filter(df_fp, tag=="fruitfly")
 ver_fp_df_tbl <- filter(df_fp, tag=="human")
 
-####### F1 scores and ROC curves
+#
+# calculate FP, FN, TP, TN in each dataset
+#
 
 cer_f1 <- mutate(cer_fp_df_tbl,
                  FPR = found/total,
@@ -61,6 +65,10 @@ ver_f1 <- mutate(ver_fp_df_tbl,
                   TN = total-found,
                   FN = ver_df_tbl$not_found)
 
+
+#
+# calculate F1 scores and MCC for each dataset
+#
 
 f1_score <- function(tp, fp, fn, tn)
 {
