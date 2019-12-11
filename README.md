@@ -44,10 +44,7 @@ nr_results/ : Parsed results of similarity searches in NCBI's NR database, see M
 
 oo_dfs/ : Raw files containing all the focal-target gene pairs found in conserved micro-synteny.
 
-
-
-
-
-
+synt_relaxed_data/ : Raw files containing the focal genes in conserved synteny with the corresponding species
+when using the relaxed synteny criteria.
 
   
