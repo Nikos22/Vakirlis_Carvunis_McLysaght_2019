@@ -499,8 +499,8 @@ ggsave(plot = complete_fig, "figures/Figure6.pdf", width=13, height = 8)
 # stats
 
 all_3_pw <- bind_rows(ver_df_hist_synt_h, dros_df_hist_synt_h, cer_df_hist_synt_h)
-ov_min_pw <- all_3[which.min(all_3_pw$pct),]
-ov_max_pw <- all_3[which.max(all_3_pw$pct),]
+ov_min_pw <- all_3_pw[which.min(all_3_pw$pct),]
+ov_max_pw <- all_3_pw[which.max(all_3_pw$pct),]
 avg_pw <- mean(all_3_pw$pct)
 
 
@@ -752,6 +752,6 @@ ggsave(plot = complete_fig, "figures/Figure6-supplement_2.pdf", width=13, height
 # stats
 
 all_3_ph <- bind_rows(ver_phylo_df_p1, dros_phylo_df_p1, cer_phylo_df_p1)
-ov_min_ph <- all_3[which.min(all_3_ph$pct),]
-ov_max_ph <- all_3[which.max(all_3_ph$pct),]
+ov_min_ph <- all_3_ph[which.min(all_3_ph$pct),]
+ov_max_ph <- all_3_ph[which.max(all_3_ph$pct),]
 avg_ph <- mean(all_3_ph$pct)
