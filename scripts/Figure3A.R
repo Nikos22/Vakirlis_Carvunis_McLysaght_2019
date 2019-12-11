@@ -8,6 +8,10 @@ setwd("~/Documents/research/Vakirlis_Carvunis_McLysaght_2019/")
 
 ################
 
+#
+# load data
+#
+
 df <- read.csv("Figure_3-source_data_1.csv")
 df$tag <- factor(df$tag, levels=c("yeast", "fruitfly", "human"), ordered = TRUE)
 
@@ -16,6 +20,10 @@ df <- filter(df, species!="Caenorhabditis_elegans")
 #
 
 df_tbl_min_ev <- group_by(df, by=speciesShort) %>% slice(which.min(evalue))
+
+#
+# plot undetectable homology percentages 
+#
 
 
 fn_pl = ggplot() +
@@ -50,6 +58,10 @@ df$tag <- factor(df$tag, levels=c("yeast", "fruitfly", "human"), ordered = TRUE)
 df <- filter(df, species!="Caenorhabditis_elegans")
 #
 df_tbl_min_ev <- group_by(df, by=speciesShort) %>% slice(which.min(evalue))
+
+#
+# plot false homology percentages 
+#
 
 fp_pl = ggplot() +
   geom_line(data = df,
