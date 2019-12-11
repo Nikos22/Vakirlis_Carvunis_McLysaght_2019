@@ -7,10 +7,10 @@ Figure5B.csv is an extended version of Figure 5B of the article in text table fo
 
 All source data that are referenced in the article can be found here:
 
-Figure_3-source_data_1.csv : Data on undetectable homologies for different E-value cut-offs used to generate the top panel of Figure 3A.
+**Figure_3-source_data_1.csv** : Data on undetectable homologies for different E-value cut-offs used to generate the top panel of Figure 3A.
 Column names: "total" : total number of genes in conserved micro-synteny, "not_found" : number of genes without significant sequence similarity, "div" : time since divergence from focal species
 
-Figure_3-source_data_2.csv : Data on false homologies for different E-value cut-offs used to generate the bottom panel of Figure 3A.
+**Figure_3-source_data_2.csv** : Data on false homologies for different E-value cut-offs used to generate the bottom panel of Figure 3A.
 Column names: "found" : number of genes with significant sequence similarity, The rest are the same as in the file above. 
 
 Figure_5_source_data_1.csv : dN and dS data used to generate Figure 5 and the accompanying stats. See Methods section for how these data were generated.
