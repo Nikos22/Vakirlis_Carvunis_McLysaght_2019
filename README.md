@@ -45,6 +45,6 @@ Column names should be self-explanatory.
 ***oo_dfs/*** : Raw files containing all the focal-target gene pairs found in conserved micro-synteny.
 
 ***synt_relaxed_data/*** : Raw files containing the focal genes in conserved synteny with the corresponding species
-when using the relaxed synteny criteria.
+when using the relaxed and stringent synteny criteria.
 
   
