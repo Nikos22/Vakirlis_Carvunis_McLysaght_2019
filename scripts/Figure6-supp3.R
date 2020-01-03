@@ -75,7 +75,13 @@ cer_gp_oo <- filter(cer_gp_oo, value==TRUE) %>%
   select(-value)
 colnames(cer_gp_oo) <- c("Gene_focal", "species")
 
-cer_gp_oo <- read.table("synt_relaxed_data/yeast_synt_genes.txt",
+cer_gp_oo_old <- cer_gp_oo
+cer_gp_oo_old$species <- as.character(cer_gp_oo_old$species)
+
+cer_gp_oo <- read.table("synt_relaxed_data/yeast_synt_relaxed_genes.txt",
+                        stringsAsFactors = FALSE,
+                        header=TRUE)
+cer_gp_oo_str <- read.table("synt_relaxed_data/yeast_synt_stringent_genes.txt",
                         stringsAsFactors = FALSE,
                         header=TRUE)
 
@@ -95,9 +101,18 @@ vert_gp_oo <- melt(vert_synt,
 vert_gp_oo <- filter(vert_gp_oo, value==TRUE) %>%
   select(-value)
 colnames(vert_gp_oo) <- c("Gene_focal", "species")
-vert_gp_oo <- read.table("synt_relaxed_data/human_synt_genes.txt",
+
+vert_gp_oo_old <- vert_gp_oo
+vert_gp_oo_old$species <- as.character(vert_gp_oo_old$species)
+
+vert_gp_oo <- read.table("synt_relaxed_data/human_synt_relaxed_genes.txt",
                         stringsAsFactors = FALSE,
                         header=TRUE)
+vert_gp_oo_str <- read.table("synt_relaxed_data/human_synt_stringent_genes.txt",
+                            stringsAsFactors = FALSE,
+                            header=TRUE)
+
+
 ###
 dros_sim <- select(dros_sim, -Gene_ID)
 dros_orphan <- melt(dros_sim,
@@ -115,12 +130,19 @@ dros_gp_oo <- filter(dros_gp_oo, value==TRUE) %>%
   select(-value)
 colnames(dros_gp_oo) <- c("Gene_focal", "species")
 
-dros_gp_oo <- read.table("synt_relaxed_data/fly_synt_genes.txt",
+dros_gp_oo_old <- dros_gp_oo
+dros_gp_oo_old$species <- as.character(dros_gp_oo_old$species)
+
+dros_gp_oo <- read.table("synt_relaxed_data/fly_synt_relaxed_genes.txt",
                         stringsAsFactors = FALSE,
                         header=TRUE)
+dros_gp_oo_str <- read.table("synt_relaxed_data/fly_synt_stringent_genes.txt",
+                            stringsAsFactors = FALSE,
+                            header=TRUE)
 
-#### Calculate phylogeny-based proportions ####
-
+########################################################
+#### Calculate phylogeny-based proportions, relaxed ####
+########################################################
 
 cer_div$species <- rownames(cer_div)
 cer_div <- cer_div[order(cer_div$V2),]
@@ -217,8 +239,208 @@ for (i in unique(dros_div$V5))
   pcts_dros_cons_num <- c(pcts_dros_cons_num, length(unique(genes_with_further)))
 }
 
+##########################################################
+#### Calculate phylogeny-based proportions, stringent ####
+##########################################################
 
-##### create data frames and plot pairwise proportions first ####
+cer_div$species <- rownames(cer_div)
+cer_div <- cer_div[order(cer_div$V2),]
+pcts_cer_all <- c()
+for (i in unique(cer_div$V2))
+{
+  species_to_get <- cer_div[which(cer_div$V2 >= i), "species"]
+  cer_orphan_p <- cer_orphan %>%
+    group_by(Gene_focal) %>%
+    filter(all(species_to_get %in% species)) %>%
+    summarise(no_sp = length(unique(species)))
+  pcts_cer_all <- c(pcts_cer_all,length(unique((cer_orphan_p$Gene_focal)))/cer_div_d$total_genes_checked[1])
+}
+
+
+pcts_cer_cons_str <- c()
+pcts_cer_cons_num_str <- c()
+
+for (i in unique(cer_div$V2))
+{
+  species_to_get <- cer_div[which(cer_div$V2 >= i), "species"]
+  genes_with_further <- unique(cer_gp_oo_str[which(cer_gp_oo_str$species %in% species_to_get), "Gene_focal"])
+  
+  cer_orphan_p <- cer_orphan %>%
+    group_by(Gene_focal) %>%
+    filter(all(species_to_get %in% species)) %>%
+    summarise(no_sp = length(unique(species)))
+  
+  pcts_cer_cons_str <- c(pcts_cer_cons_str,length(unique(which(genes_with_further %in% cer_orphan_p$Gene_focal)))/length(unique(genes_with_further)))
+  pcts_cer_cons_num_str <- c(pcts_cer_cons_num_str, length(unique(genes_with_further)))
+}
+
+vert_div$species <- rownames(vert_div)
+vert_div <- vert_div[order(vert_div$V2),]
+
+pcts_vert_all <- c()
+for (i in unique(vert_div$V2))
+{
+  species_to_get <- vert_div[which(vert_div$V2 >= i), "species"]
+  vert_orphan_p <- vert_orphan %>%
+    group_by(Gene_focal) %>%
+    filter(all(species_to_get %in% species)) %>%
+    summarise(no_sp = length(unique(species)))
+  pcts_vert_all <- c(pcts_vert_all,length(unique((vert_orphan_p$Gene_focal)))/vert_div_d$total_genes_checked[1])
+}
+
+
+pcts_vert_cons_str <- c()
+pcts_vert_cons_num_str <- c()
+for (i in unique(vert_div$V2))
+{
+  
+  species_to_get <- vert_div[which(vert_div$V2 >= i), "species"]
+  genes_with_further <- unique(vert_gp_oo_str[which(vert_gp_oo_str$species %in% species_to_get), "Gene_focal"])
+  
+  vert_orphan_p <- vert_orphan %>%
+    group_by(Gene_focal) %>%
+    filter(all(species_to_get %in% species)) %>%
+    summarise(no_sp = length(unique(species)))
+  
+  pcts_vert_cons_str <- c(pcts_vert_cons_str,length(unique(which(genes_with_further %in% vert_orphan_p$Gene_focal)))/length(unique(genes_with_further)))
+  pcts_vert_cons_num_str <- c(pcts_vert_cons_num_str, length(unique(genes_with_further)))
+}
+
+
+dros_div <- dros_div[order(dros_div$V5),]
+dros_div$species <- rownames(dros_div)
+pcts_dros_all <- c()
+for (i in unique(dros_div$V5))
+{
+  species_to_get <- dros_div[which(dros_div$V5 >= i), "species"]
+  dros_orphan_p <- dros_orphan %>%
+    group_by(Gene_focal) %>%
+    filter(all(species_to_get %in% species)) %>%
+    summarise(no_sp = length(unique(species)))
+  pcts_dros_all <- c(pcts_dros_all,length(unique((dros_orphan_p$Gene_focal)))/dros_div_d$total_genes_checked[1])
+}
+
+
+pcts_dros_cons_str <- c()
+pcts_dros_cons_num_str <- c()
+for (i in unique(dros_div$V5))
+{
+  
+  species_to_get <- dros_div[which(dros_div$V5 >= i), "species"]
+  genes_with_further <- unique(dros_gp_oo_str[which(dros_gp_oo_str$species %in% species_to_get), "Gene_focal"])
+  
+  dros_orphan_p <- dros_orphan %>%
+    group_by(Gene_focal) %>%
+    filter(all(species_to_get %in% species)) %>%
+    summarise(no_sp = length(unique(species)))
+  
+  pcts_dros_cons_str <- c(pcts_dros_cons_str,length(unique(which(genes_with_further %in% dros_orphan_p$Gene_focal)))/length(unique(genes_with_further)))
+  pcts_dros_cons_num_str <- c(pcts_dros_cons_num_str, length(unique(genes_with_further)))
+}
+
+
+##########################################################
+#### Calculate phylogeny-based proportions, current ####
+##########################################################
+
+cer_div$species <- rownames(cer_div)
+cer_div <- cer_div[order(cer_div$V2),]
+pcts_cer_all <- c()
+for (i in unique(cer_div$V2))
+{
+  species_to_get <- cer_div[which(cer_div$V2 >= i), "species"]
+  cer_orphan_p <- cer_orphan %>%
+    group_by(Gene_focal) %>%
+    filter(all(species_to_get %in% species)) %>%
+    summarise(no_sp = length(unique(species)))
+  pcts_cer_all <- c(pcts_cer_all,length(unique((cer_orphan_p$Gene_focal)))/cer_div_d$total_genes_checked[1])
+}
+
+
+pcts_cer_cons_old <- c()
+pcts_cer_cons_num_old <- c()
+
+for (i in unique(cer_div$V2))
+{
+  species_to_get <- cer_div[which(cer_div$V2 >= i), "species"]
+  genes_with_further <- unique(cer_gp_oo_old[which(cer_gp_oo_old$species %in% species_to_get), "Gene_focal"])
+  
+  cer_orphan_p <- cer_orphan %>%
+    group_by(Gene_focal) %>%
+    filter(all(species_to_get %in% species)) %>%
+    summarise(no_sp = length(unique(species)))
+  
+  pcts_cer_cons_old <- c(pcts_cer_cons_old,length(unique(which(genes_with_further %in% cer_orphan_p$Gene_focal)))/length(unique(genes_with_further)))
+  pcts_cer_cons_num_old <- c(pcts_cer_cons_num_old, length(unique(genes_with_further)))
+}
+
+vert_div$species <- rownames(vert_div)
+vert_div <- vert_div[order(vert_div$V2),]
+
+pcts_vert_all <- c()
+for (i in unique(vert_div$V2))
+{
+  species_to_get <- vert_div[which(vert_div$V2 >= i), "species"]
+  vert_orphan_p <- vert_orphan %>%
+    group_by(Gene_focal) %>%
+    filter(all(species_to_get %in% species)) %>%
+    summarise(no_sp = length(unique(species)))
+  pcts_vert_all <- c(pcts_vert_all,length(unique((vert_orphan_p$Gene_focal)))/vert_div_d$total_genes_checked[1])
+}
+
+
+pcts_vert_cons_old <- c()
+pcts_vert_cons_num_old <- c()
+for (i in unique(vert_div$V2))
+{
+  
+  species_to_get <- vert_div[which(vert_div$V2 >= i), "species"]
+  genes_with_further <- unique(vert_gp_oo_old[which(vert_gp_oo_old$species %in% species_to_get), "Gene_focal"])
+  
+  vert_orphan_p <- vert_orphan %>%
+    group_by(Gene_focal) %>%
+    filter(all(species_to_get %in% species)) %>%
+    summarise(no_sp = length(unique(species)))
+  
+  pcts_vert_cons_old <- c(pcts_vert_cons_old,length(unique(which(genes_with_further %in% vert_orphan_p$Gene_focal)))/length(unique(genes_with_further)))
+  pcts_vert_cons_num_old <- c(pcts_vert_cons_num_old, length(unique(genes_with_further)))
+}
+
+
+dros_div <- dros_div[order(dros_div$V5),]
+dros_div$species <- rownames(dros_div)
+pcts_dros_all <- c()
+for (i in unique(dros_div$V5))
+{
+  species_to_get <- dros_div[which(dros_div$V5 >= i), "species"]
+  dros_orphan_p <- dros_orphan %>%
+    group_by(Gene_focal) %>%
+    filter(all(species_to_get %in% species)) %>%
+    summarise(no_sp = length(unique(species)))
+  pcts_dros_all <- c(pcts_dros_all,length(unique((dros_orphan_p$Gene_focal)))/dros_div_d$total_genes_checked[1])
+}
+
+
+pcts_dros_cons_old <- c()
+pcts_dros_cons_num_old <- c()
+for (i in unique(dros_div$V5))
+{
+  
+  species_to_get <- dros_div[which(dros_div$V5 >= i), "species"]
+  genes_with_further <- unique(dros_gp_oo_old[which(dros_gp_oo_old$species %in% species_to_get), "Gene_focal"])
+  
+  dros_orphan_p <- dros_orphan %>%
+    group_by(Gene_focal) %>%
+    filter(all(species_to_get %in% species)) %>%
+    summarise(no_sp = length(unique(species)))
+  
+  pcts_dros_cons_old <- c(pcts_dros_cons_old,length(unique(which(genes_with_further %in% dros_orphan_p$Gene_focal)))/length(unique(genes_with_further)))
+  pcts_dros_cons_num_old <- c(pcts_dros_cons_num_old, length(unique(genes_with_further)))
+}
+
+##########################################################################
+##### create data frames and plot pairwise proportions first, relaxed ####
+##########################################################################
 
 
 cer_orphan_synt <- cer_orphan %>% filter(paste(Gene_focal, species) %in% paste(cer_gp_oo$Gene_focal, cer_gp_oo$species))
@@ -239,6 +461,9 @@ cer_df_hist_all <- as.data.frame(table(cer_orphan$species)) %>%
   dplyr::rename(species=Var1) %>%
   mutate(div = cer_div_d[match(species, cer_div_d$species), "Divergence_time"]) %>%
   arrange(div)
+
+
+cer_df_hist_all <- cer_df_hist_all[match(cer_df_hist_synt$species, cer_df_hist_all$species), ]
 
 cer_div_jitter <- jitter(cer_df_hist_synt$div, factor=5)
 
@@ -263,13 +488,14 @@ ver_df_hist_all <- as.data.frame(table(vert_orphan$species)) %>%
   mutate(div = vert_div_d[match(species, vert_div_d$species), "Divergence_time"]) %>%
   arrange(div)
 
-
+ver_df_hist_all <- ver_df_hist_all[match(ver_df_hist_synt$species, ver_df_hist_all$species), ]
 
 
 dros_orphan <- filter(dros_orphan , species != "Solenopsis_invicta", species != "Caenorhabditis_elegans")
 dros_gp_oo <- filter(dros_gp_oo, species != "Caenorhabditis_elegans")
 dros_orphan_synt <- dros_orphan %>% filter(paste(Gene_focal, species) %in% paste(dros_gp_oo$Gene_focal, dros_gp_oo$species))
 dros_orphan_synt$species <- as.character(dros_orphan_synt$species)
+
 
 dros_df_hist_synt <- as.data.frame(table(dros_orphan_synt$species)) %>%
   mutate(pct = ((Freq)/as.data.frame(table(dros_gp_oo$species))$Freq),
@@ -285,78 +511,149 @@ dros_df_hist_all <- as.data.frame(table(dros_orphan$species)) %>%
   mutate(div = dros_div_d[match(species, dros_div_d$species), "Divergence_time"]) %>%
   arrange(div)
 
+dros_df_hist_all <- dros_df_hist_all[match(dros_df_hist_synt$species, dros_df_hist_all$species), ]
 dros_div_jitter <- jitter(dros_df_hist_synt$div, factor=5)
 
 
+############################################################################
+##### create data frames and plot pairwise proportions first, stringent ####
+############################################################################
+
+
+cer_orphan_synt <- cer_orphan %>% filter(paste(Gene_focal, species) %in% paste(cer_gp_oo_str$Gene_focal, cer_gp_oo_str$species))
+cer_orphan_synt$species <- as.character(cer_orphan_synt$species)
+temp <- data.frame(Var1=unique(cer_gp_oo_str$species)[which(!unique(cer_gp_oo_str$species) %in% unique(cer_orphan_synt$species))], Freq=0)
+
+cer_df_hist_synt_str <- rbind(as.data.frame(table(cer_orphan_synt$species)), temp) %>%
+  arrange(as.character(Var1)) %>%
+  mutate(pct = ((Freq)/as.data.frame(table(cer_gp_oo_str$species))$Freq),
+         sep = sqrt(pct*(1-pct)/as.data.frame(table(cer_gp_oo_str$species))$Freq)) %>%
+  dplyr::rename(species=Var1) %>%
+  mutate(div = cer_div_d[match(species, cer_div_d$species), "Divergence_time"]) %>%
+  arrange(div)
+
+
+vert_orphan_synt <- vert_orphan %>% filter(paste(Gene_focal, species) %in% paste(vert_gp_oo_str$Gene_focal, vert_gp_oo_str$species))
+vert_orphan_synt$species <- as.character(vert_orphan_synt$species)
+temp <- data.frame(Var1=unique(vert_gp_oo_str$species)[which(!unique(vert_gp_oo_str$species) %in% unique(vert_orphan_synt$species))], Freq=0)
+
+
+ver_df_hist_synt_str <- rbind(as.data.frame(table(vert_orphan_synt$species)), temp) %>%
+  arrange(as.character(Var1)) %>%
+  mutate(pct = ((Freq)/as.data.frame(table(vert_gp_oo_str$species))$Freq),
+         sep = sqrt(pct*(1-pct)/as.data.frame(table(vert_gp_oo_str$species))$Freq)) %>%
+  dplyr::rename(species=Var1) %>%
+  mutate(div = vert_div_d[match(species, vert_div_d$species), "Divergence_time"]) %>%
+  arrange(div)
+
+
+
+dros_orphan <- filter(dros_orphan , species != "Solenopsis_invicta", species != "Caenorhabditis_elegans")
+dros_gp_oo_str <- filter(dros_gp_oo_str, species != "Caenorhabditis_elegans")
+dros_orphan_synt <- dros_orphan %>% filter(paste(Gene_focal, species) %in% paste(dros_gp_oo_str$Gene_focal, dros_gp_oo_str$species))
+dros_orphan_synt$species <- as.character(dros_orphan_synt$species)
+temp <- data.frame(Var1=unique(dros_gp_oo_str$species)[which(!unique(dros_gp_oo_str$species) %in% unique(dros_orphan_synt$species))], Freq=0)
+
+
+dros_df_hist_synt_str <- rbind(as.data.frame(table(dros_orphan_synt$species)), temp) %>%
+  arrange(as.character(Var1)) %>%
+  mutate(pct = ((Freq)/as.data.frame(table(dros_gp_oo_str$species))$Freq),
+         sep = sqrt(pct*(1-pct)/as.data.frame(table(dros_gp_oo_str$species))$Freq)) %>%
+  dplyr::rename(species=Var1) %>%
+  mutate(div = dros_div_d[match(species, dros_div_d$species), "Divergence_time"]) %>%
+  arrange(div)
+
+
+############################################################################
+##### create data frames and plot pairwise proportions first, current ####
+############################################################################
+
+
+cer_orphan_synt <- cer_orphan %>% filter(paste(Gene_focal, species) %in% paste(cer_gp_oo_old$Gene_focal, cer_gp_oo_old$species))
+cer_orphan_synt$species <- as.character(cer_orphan_synt$species)
+
+cer_df_hist_synt_old <- as.data.frame(table(cer_orphan_synt$species)) %>%
+  mutate(pct = ((Freq)/as.data.frame(table(cer_gp_oo_old$species))$Freq),
+         sep = sqrt(pct*(1-pct)/as.data.frame(table(cer_gp_oo_old$species))$Freq)) %>%
+  dplyr::rename(species=Var1) %>%
+  mutate(div = cer_div_d[match(species, cer_div_d$species), "Divergence_time"]) %>%
+  arrange(div)
+
+
+vert_orphan_synt <- vert_orphan %>% filter(paste(Gene_focal, species) %in% paste(vert_gp_oo_old$Gene_focal, vert_gp_oo_old$species))
+vert_orphan_synt$species <- as.character(vert_orphan_synt$species)
+
+
+ver_df_hist_synt_old <- as.data.frame(table(vert_orphan_synt$species)) %>%
+  mutate(pct = ((Freq)/as.data.frame(table(vert_gp_oo_old$species))$Freq),
+         sep = sqrt(pct*(1-pct)/as.data.frame(table(vert_gp_oo_old$species))$Freq)) %>%
+  dplyr::rename(species=Var1) %>%
+  mutate(div = vert_div_d[match(species, vert_div_d$species), "Divergence_time"]) %>%
+  arrange(div)
+
+
+
+dros_orphan <- filter(dros_orphan , species != "Solenopsis_invicta", species != "Caenorhabditis_elegans")
+dros_gp_oo_old <- filter(dros_gp_oo_old, species != "Caenorhabditis_elegans")
+dros_orphan_synt <- dros_orphan %>% filter(paste(Gene_focal, species) %in% paste(dros_gp_oo_old$Gene_focal, dros_gp_oo_old$species))
+dros_orphan_synt$species <- as.character(dros_orphan_synt$species)
+temp <- data.frame(Var1=unique(dros_gp_oo_old$species)[which(!unique(dros_gp_oo_old$species) %in% unique(dros_orphan_synt$species))], Freq=0)
+
+
+dros_df_hist_synt_old <- rbind(as.data.frame(table(dros_orphan_synt$species)), temp) %>%
+  arrange(as.character(Var1)) %>%
+  mutate(pct = ((Freq)/as.data.frame(table(dros_gp_oo_old$species))$Freq),
+         sep = sqrt(pct*(1-pct)/as.data.frame(table(dros_gp_oo_old$species))$Freq)) %>%
+  dplyr::rename(species=Var1) %>%
+  mutate(div = dros_div_d[match(species, dros_div_d$species), "Divergence_time"]) %>%
+  arrange(div)
 
 #######
 
+### relaxed ###
 ver_df_hist_synt$tag <- "With undetected homologues"
 ver_df_hist_synt_h <- select(ver_df_hist_synt, pct, sep, div, tag, species)
-ver_df_hist_all$tag <- "All genes"
-ver_df_hist_all_h <- select(ver_df_hist_all, pct, sep, div, tag, species)
-ver_df_c <- bind_rows(ver_df_hist_synt_h, ver_df_hist_all_h)
+ver_df_hist_synt_h$pct <- ver_df_hist_synt_h$pct/ver_df_hist_all$pct
+ver_df_hist_synt_h$species <- as.character(ver_df_hist_synt_h$species)
+ver_df_hist_synt_h$species <- paste(substr(ver_df_hist_synt_h$species, 1, 1), substr(unlist(strsplit(ver_df_hist_synt_h$species, split = "_"))[2*(1:length(ver_df_hist_synt_h$species))],1,3), sep='')
+ver_df_hist_synt_h$species <- factor(ver_df_hist_synt_h$species, levels = sp1[which(sp1$tag=="human"), "speciesShort"], ordered = TRUE)
+ver_df_hist_synt_h$type="relaxed"
 
-ver_df_c$species <- as.character(ver_df_c$species)
-ver_df_c$species <- paste(substr(ver_df_c$species, 1, 1), substr(unlist(strsplit(ver_df_c$species, split = "_"))[2*(1:length(ver_df_c$species))],1,3), sep='')
+### stringent ###
+ver_df_hist_synt_str$tag <- "With undetected homologues"
+ver_df_hist_synt_str_h <- select(ver_df_hist_synt_str, pct, sep, div, tag, species)
+ver_df_hist_synt_str_h$pct <- ver_df_hist_synt_str_h$pct/ver_df_hist_all$pct
+ver_df_hist_synt_str_h$species <- as.character(ver_df_hist_synt_str_h$species)
+ver_df_hist_synt_str_h$species <- paste(substr(ver_df_hist_synt_str_h$species, 1, 1), substr(unlist(strsplit(ver_df_hist_synt_str_h$species, split = "_"))[2*(1:length(ver_df_hist_synt_str_h$species))],1,3), sep='')
+ver_df_hist_synt_str_h$species <- factor(ver_df_hist_synt_str_h$species, levels = sp1[which(sp1$tag=="human"), "speciesShort"], ordered = TRUE)
+ver_df_hist_synt_str_h$type="stringent"
 
-ver_df_c$species <- factor(ver_df_c$species, levels = sp1[which(sp1$tag=="human"), "speciesShort"], ordered = TRUE)
+### current ###
+ver_df_hist_synt_old$tag <- "With undetected homologues"
+ver_df_hist_synt_old_h <- select(ver_df_hist_synt_old, pct, sep, div, tag, species)
+ver_df_hist_synt_old_h$pct <- ver_df_hist_synt_old_h$pct/ver_df_hist_all$pct
+ver_df_hist_synt_old_h$species <- as.character(ver_df_hist_synt_old_h$species)
+ver_df_hist_synt_old_h$species <- paste(substr(ver_df_hist_synt_old_h$species, 1, 1), substr(unlist(strsplit(ver_df_hist_synt_old_h$species, split = "_"))[2*(1:length(ver_df_hist_synt_old_h$species))],1,3), sep='')
+ver_df_hist_synt_old_h$species <- factor(ver_df_hist_synt_old_h$species, levels = sp1[which(sp1$tag=="human"), "speciesShort"], ordered = TRUE)
 
+ver_df_hist_synt_old_h$type="current"
 
+ver_df_c <- bind_rows(ver_df_hist_synt_old_h,
+                      ver_df_hist_synt_str_h,
+                      ver_df_hist_synt_h)
+ver_df_c$type <- factor(ver_df_c$type, levels=c("relaxed", "current", "stringent"), ordered = TRUE)
 
-
-dros_df_hist_synt$tag <- "With undetected homologues"
-dros_df_hist_synt_h <- select(dros_df_hist_synt, pct, sep, div, tag, species)
-dros_df_hist_all$tag <- "All genes"
-dros_df_hist_all_h <- select(dros_df_hist_all, pct, sep, div, tag, species)
-dros_df_c <- bind_rows(dros_df_hist_synt_h, dros_df_hist_all_h)
-
-dros_df_c$species <- as.character(dros_df_c$species)
-dros_df_c$species <- paste(substr(dros_df_c$species, 1, 1), substr(unlist(strsplit(dros_df_c$species, split = "_"))[2*(1:length(dros_df_c$species))],1,3), sep='')
-
-dros_df_c$species <- factor(dros_df_c$species, levels = sp1[which(sp1$tag=="fruitfly"), "speciesShort"], ordered = TRUE)
-
-
-cer_df_hist_synt$tag <- "With undetected homologues"
-cer_df_hist_synt_h <- select(cer_df_hist_synt, pct, sep, div, tag, species)
-cer_df_hist_all$tag <- "All genes"
-cer_df_hist_all_h <- select(cer_df_hist_all, pct, sep, div, tag, species)
-cer_df_c <- bind_rows(cer_df_hist_synt_h, cer_df_hist_all_h)
-
-cer_df_c$species <- as.character(cer_df_c$species)
-cer_df_c$species <- paste(substr(cer_df_c$species, 1, 1), substr(unlist(strsplit(cer_df_c$species, split = "_"))[2*(1:length(cer_df_c$species))],1,3), sep='')
-
-cer_df_c$species <- factor(cer_df_c$species, levels = sp1[which(sp1$tag=="yeast"), "speciesShort"], ordered = TRUE)
-
-
-####
-
-ver_df_hist_synt$tag <- "With undetected homologues"
-ver_df_hist_synt_h <- select(ver_df_hist_synt, pct, sep, div, tag, species)
-ver_df_hist_all$tag <- "All genes"
-ver_df_hist_all_h <- select(ver_df_hist_all, pct, sep, div, tag, species)
-ver_df_hist_synt_h$pct <- ver_df_hist_synt_h$pct/ver_df_hist_all_h$pct
-ver_df_hist_all_h$pct <- 1
-
-ver_df_c <- bind_rows(ver_df_hist_all_h, ver_df_hist_synt_h)
-
-ver_df_c$species <- as.character(ver_df_c$species)
-ver_df_c$species <- paste(substr(ver_df_c$species, 1, 1), substr(unlist(strsplit(ver_df_c$species, split = "_"))[2*(1:length(ver_df_c$species))],1,3), sep='')
-
-ver_df_c$species <- factor(ver_df_c$species, levels = sp1[which(sp1$tag=="human"), "speciesShort"], ordered = TRUE)
 
 hist_ver <- ggplot() +
   geom_bar(data = ver_df_c, 
            aes(x=species, 
                y=pct,
-               fill=tag),
+               fill=type,
+               alpha=type),
            stat="identity",
-           position = position_identity(), 
+           position = position_dodge(), 
            colour="black") +
-  scale_fill_manual(values = c("white", "#56B4E9")) +
-  geom_hline(aes(yintercept=mean(ver_df_c[ver_df_c$tag=="With undetected homologues", "pct"])),
-             colour="red",
-             size=2) +
+  scale_fill_manual(values = c("skyblue1", "dodgerblue2", "blue3")) +
   theme(text = element_text(size=14),
         axis.text = element_text(size=14, colour="black"),
         axis.text.x = element_text(angle=60, hjust=1),
@@ -369,32 +666,51 @@ hist_ver <- ggplot() +
   ylab("")
 
 
+### relaxed ###
 dros_df_hist_synt$tag <- "With undetected homologues"
 dros_df_hist_synt_h <- select(dros_df_hist_synt, pct, sep, div, tag, species)
-dros_df_hist_all$tag <- "All genes"
-dros_df_hist_all_h <- select(dros_df_hist_all, pct, sep, div, tag, species)
-dros_df_hist_synt_h$pct <- dros_df_hist_synt_h$pct/dros_df_hist_all_h$pct
-dros_df_hist_all_h$pct <- 1
+dros_df_hist_synt_h$pct <- dros_df_hist_synt_h$pct/dros_df_hist_all$pct
+dros_df_hist_synt_h$species <- as.character(dros_df_hist_synt_h$species)
+dros_df_hist_synt_h$species <- paste(substr(dros_df_hist_synt_h$species, 1, 1), substr(unlist(strsplit(dros_df_hist_synt_h$species, split = "_"))[2*(1:length(dros_df_hist_synt_h$species))],1,3), sep='')
+dros_df_hist_synt_h$species <- factor(dros_df_hist_synt_h$species, levels = sp1[which(sp1$tag=="fruitfly"), "speciesShort"], ordered = TRUE)
+dros_df_hist_synt_h$type="relaxed"
 
-dros_df_c <- bind_rows(dros_df_hist_all_h, dros_df_hist_synt_h)
+### stringent ###
+dros_df_hist_synt_str$tag <- "With undetected homologues"
+dros_df_hist_synt_str_h <- select(dros_df_hist_synt_str, pct, sep, div, tag, species)
+dros_df_hist_synt_str_h$pct <- dros_df_hist_synt_str_h$pct/dros_df_hist_all$pct
+dros_df_hist_synt_str_h$species <- as.character(dros_df_hist_synt_str_h$species)
+dros_df_hist_synt_str_h$species <- paste(substr(dros_df_hist_synt_str_h$species, 1, 1), substr(unlist(strsplit(dros_df_hist_synt_str_h$species, split = "_"))[2*(1:length(dros_df_hist_synt_str_h$species))],1,3), sep='')
+dros_df_hist_synt_str_h$species <- factor(dros_df_hist_synt_str_h$species, levels = sp1[which(sp1$tag=="fruitfly"), "speciesShort"], ordered = TRUE)
+dros_df_hist_synt_str_h$type="stringent"
 
-dros_df_c$species <- as.character(dros_df_c$species)
-dros_df_c$species <- paste(substr(dros_df_c$species, 1, 1), substr(unlist(strsplit(dros_df_c$species, split = "_"))[2*(1:length(dros_df_c$species))],1,3), sep='')
+### current ###
+dros_df_hist_synt_old$tag <- "With undetected homologues"
+dros_df_hist_synt_old_h <- select(dros_df_hist_synt_old, pct, sep, div, tag, species)
+dros_df_hist_synt_old_h$pct <- dros_df_hist_synt_old_h$pct/dros_df_hist_all$pct
+dros_df_hist_synt_old_h$species <- as.character(dros_df_hist_synt_old_h$species)
+dros_df_hist_synt_old_h$species <- paste(substr(dros_df_hist_synt_old_h$species, 1, 1), substr(unlist(strsplit(dros_df_hist_synt_old_h$species, split = "_"))[2*(1:length(dros_df_hist_synt_old_h$species))],1,3), sep='')
+dros_df_hist_synt_old_h$species <- factor(dros_df_hist_synt_old_h$species, levels = sp1[which(sp1$tag=="fruitfly"), "speciesShort"], ordered = TRUE)
 
-dros_df_c$species <- factor(dros_df_c$species, levels = sp1[which(sp1$tag=="fruitfly"), "speciesShort"], ordered = TRUE)
+dros_df_hist_synt_old_h$type="current"
+
+dros_df_c <- bind_rows(dros_df_hist_synt_old_h,
+                      dros_df_hist_synt_str_h,
+                      dros_df_hist_synt_h)
+dros_df_c$type <- factor(dros_df_c$type, levels=c("relaxed", "current", "stringent"), ordered = TRUE)
+
+
 
 hist_dros <- ggplot() +
   geom_bar(data = dros_df_c, 
            aes(x=species, 
                y=pct,
-               fill=tag),
+               fill=type,
+               alpha=type),
            stat="identity",
-           position = position_identity(), 
+           position = position_dodge(), 
            colour="black") +
-  scale_fill_manual(values = c("white", "#E69F00")) +
-  geom_hline(aes(yintercept=mean(dros_df_c[dros_df_c$tag=="With undetected homologues", "pct"])),
-             colour="red",
-             size=2) +
+  scale_fill_manual(values = c("tan1", "darkorange", "darkorange4")) +
   theme(text = element_text(size=14),
         axis.text = element_text(size=14, colour="black"),
         axis.text.x = element_text(angle=60, hjust=1),
@@ -407,33 +723,50 @@ hist_dros <- ggplot() +
   ylab("")
 
 
-
+###
+### relaxed ###
 cer_df_hist_synt$tag <- "With undetected homologues"
 cer_df_hist_synt_h <- select(cer_df_hist_synt, pct, sep, div, tag, species)
-cer_df_hist_all$tag <- "All genes"
-cer_df_hist_all_h <- select(cer_df_hist_all, pct, sep, div, tag, species)
-cer_df_hist_synt_h$pct <- cer_df_hist_synt_h$pct/cer_df_hist_all_h$pct
-cer_df_hist_all_h$pct <- 1
+cer_df_hist_synt_h$pct <- cer_df_hist_synt_h$pct/cer_df_hist_all$pct
+cer_df_hist_synt_h$species <- as.character(cer_df_hist_synt_h$species)
+cer_df_hist_synt_h$species <- paste(substr(cer_df_hist_synt_h$species, 1, 1), substr(unlist(strsplit(cer_df_hist_synt_h$species, split = "_"))[2*(1:length(cer_df_hist_synt_h$species))],1,3), sep='')
+cer_df_hist_synt_h$species <- factor(cer_df_hist_synt_h$species, levels = sp1[which(sp1$tag=="yeast"), "speciesShort"], ordered = TRUE)
+cer_df_hist_synt_h$type="relaxed"
 
-cer_df_c <- bind_rows(cer_df_hist_all_h, cer_df_hist_synt_h)
+### stringent ###
+cer_df_hist_synt_str$tag <- "With undetected homologues"
+cer_df_hist_synt_str_h <- select(cer_df_hist_synt_str, pct, sep, div, tag, species)
+cer_df_hist_synt_str_h$pct <- cer_df_hist_synt_str_h$pct/cer_df_hist_all$pct
+cer_df_hist_synt_str_h$species <- as.character(cer_df_hist_synt_str_h$species)
+cer_df_hist_synt_str_h$species <- paste(substr(cer_df_hist_synt_str_h$species, 1, 1), substr(unlist(strsplit(cer_df_hist_synt_str_h$species, split = "_"))[2*(1:length(cer_df_hist_synt_str_h$species))],1,3), sep='')
+cer_df_hist_synt_str_h$species <- factor(cer_df_hist_synt_str_h$species, levels = sp1[which(sp1$tag=="yeast"), "speciesShort"], ordered = TRUE)
+cer_df_hist_synt_str_h$type="stringent"
 
-cer_df_c$species <- as.character(cer_df_c$species)
-cer_df_c$species <- paste(substr(cer_df_c$species, 1, 1), substr(unlist(strsplit(cer_df_c$species, split = "_"))[2*(1:length(cer_df_c$species))],1,3), sep='')
+### current ###
+cer_df_hist_synt_old$tag <- "With undetected homologues"
+cer_df_hist_synt_old_h <- select(cer_df_hist_synt_old, pct, sep, div, tag, species)
+cer_df_hist_synt_old_h$pct <- cer_df_hist_synt_old_h$pct/cer_df_hist_all$pct
+cer_df_hist_synt_old_h$species <- as.character(cer_df_hist_synt_old_h$species)
+cer_df_hist_synt_old_h$species <- paste(substr(cer_df_hist_synt_old_h$species, 1, 1), substr(unlist(strsplit(cer_df_hist_synt_old_h$species, split = "_"))[2*(1:length(cer_df_hist_synt_old_h$species))],1,3), sep='')
+cer_df_hist_synt_old_h$species <- factor(cer_df_hist_synt_old_h$species, levels = sp1[which(sp1$tag=="yeast"), "speciesShort"], ordered = TRUE)
 
-cer_df_c$species <- factor(cer_df_c$species, levels = sp1[which(sp1$tag=="yeast"), "speciesShort"], ordered = TRUE)
+cer_df_hist_synt_old_h$type="current"
+
+cer_df_c <- bind_rows(cer_df_hist_synt_old_h,
+                       cer_df_hist_synt_str_h,
+                       cer_df_hist_synt_h)
+cer_df_c$type <- factor(cer_df_c$type, levels=c("relaxed", "current", "stringent"), ordered = TRUE)
+
 
 hist_cer <- ggplot() +
   geom_bar(data = cer_df_c, 
            aes(x=species, 
                y=pct,
-               fill=tag),
+               fill=type),
            stat="identity",
-           position = position_identity(), 
+           position = position_dodge(), 
            colour="black") +
-  scale_fill_manual(values = c("white", "#999999")) +
-  geom_hline(aes(yintercept=mean(cer_df_c[cer_df_c$tag=="With undetected homologues", "pct"])),
-             colour="red",
-             size=2) +
+  scale_fill_manual(values = c("grey78", "grey41", "grey16")) +
   theme(text = element_text(size=14),
         axis.text = element_text(size=14, colour="black"),
         axis.text.x = element_text(angle=60, hjust=1),
@@ -446,57 +779,126 @@ hist_cer <- ggplot() +
   ylab("")
 
 
-# stats
+# comparing relaxed to current
 
-all_3_pw <- bind_rows(ver_df_hist_synt_h, dros_df_hist_synt_h, cer_df_hist_synt_h)
-ov_min_pw <- all_3_pw[which.min(all_3_pw$pct),]
-ov_max_pw <- all_3_pw[which.max(all_3_pw$pct),]
-avg_pw <- mean(all_3_pw$pct)
+summary(c(cer_df_hist_synt_old_h$pct, dros_df_hist_synt_old_h$pct, ver_df_hist_synt_old_h$pct))
+summary(c(cer_df_hist_synt_h$pct, dros_df_hist_synt_h$pct, ver_df_hist_synt_h$pct))
+
+avg_change <- mean(abs(c(cer_df_hist_synt_old_h$pct, dros_df_hist_synt_old_h$pct, ver_df_hist_synt_old_h$pct)-
+                        c(cer_df_hist_synt_h$pct, dros_df_hist_synt_h$pct, ver_df_hist_synt_h$pct)))
+                       
+
+sp_with_more_300_in_string <- rbind(as.data.frame(table(cer_gp_oo_str$species)),
+                                    as.data.frame(table(dros_gp_oo_str$species)),
+                                    as.data.frame(table(vert_gp_oo_str$species))) %>%
+                              filter(Freq>200) %>%
+                              select(Var1) %>%
+                              rename(species=Var1)
+
+sp_with_more_300_in_string$species <- as.character(sp_with_more_300_in_string$species)
+sp_with_more_300_in_string$species <- paste(substr(sp_with_more_300_in_string$species, 1, 1), substr(unlist(strsplit(sp_with_more_300_in_string$species, split = "_"))[2*(1:length(sp_with_more_300_in_string$species))],1,3), sep='')
+
+
+all_cur <- bind_rows(cer_df_hist_synt_old_h,
+                     dros_df_hist_synt_old_h,
+                     ver_df_hist_synt_old_h) %>%
+          filter(species %in% sp_with_more_300_in_string$species)
+
+all_str <- bind_rows(cer_df_hist_synt_str_h,
+                     dros_df_hist_synt_str_h,
+                     ver_df_hist_synt_str_h) %>%
+  filter(species %in% sp_with_more_300_in_string$species)
+
+summary(all_str$pct)
+summary(all_cur$pct)
 
 
 ##### create data frames and plot phylogeny based proportions ####
 
-ver_phylo_df_p1 <- data.frame(pct_found = pcts_vert_cons/pcts_vert_all,
+ver_df_c2 <- data.frame(pct_found = pcts_vert_cons/pcts_vert_all,
                               tag = "With predicted undetectable homologues",
-                              div = unique(vert_div$V2),
-                              synt_missed = pcts_vert_cons,
-                              all_missed = pcts_vert_all)
+                              div = unique(vert_div$V2))
+ver_df_c2$div <- factor(ver_df_c2$div, levels = unique(ver_df_c2$div), ordered = TRUE)
+ver_df_c2$type="relaxed"
+
+ver_df_c2_str <- data.frame(pct_found = pcts_vert_cons_str/pcts_vert_all,
+                        tag = "With predicted undetectable homologues",
+                        div = unique(vert_div$V2))
+ver_df_c2_str$div <- factor(ver_df_c2_str$div, levels = unique(ver_df_c2_str$div), ordered = TRUE)
+ver_df_c2_str$type="stringent"
+
+ver_df_c2_old <- data.frame(pct_found = pcts_vert_cons_old/pcts_vert_all,
+                            tag = "With predicted undetectable homologues",
+                            div = unique(vert_div$V2))
+ver_df_c2_old$div <- factor(ver_df_c2_old$div, levels = unique(ver_df_c2_old$div), ordered = TRUE)
+ver_df_c2_old$type="current"
+
+ver_df_c2_tot <- bind_rows(ver_df_c2, ver_df_c2_old, ver_df_c2_str)
+ver_df_c2_tot$type <- factor(ver_df_c2_tot$type, levels=c("relaxed", "current", "stringent"), ordered = TRUE)
 
 
-dros_phylo_df_p1 <- data.frame(pct_found = pcts_dros_cons/pcts_dros_all,
-                              tag = "With predicted undetectable homologues",
-                              div = unique(dros_div$V5),
-                              synt_missed = pcts_dros_cons,
-                              all_missed = pcts_dros_all)
 
 
-cer_phylo_df_p1 <- data.frame(pct_found = pcts_cer_cons/pcts_cer_all,
-                               tag = "With predicted undetectable homologues",
-                               div = unique(cer_div$V2),
-                               synt_missed = pcts_cer_cons,
-                               all_missed = pcts_cer_all)
+cer_df_c2 <- data.frame(pct_found = pcts_cer_cons/pcts_cer_all,
+                        tag = "With predicted undetectable homologues",
+                        div = unique(cer_div$V2))
+cer_df_c2$div <- factor(cer_df_c2$div, levels = unique(cer_df_c2$div), ordered = TRUE)
+cer_df_c2$type="relaxed"
+
+cer_df_c2_str <- data.frame(pct_found = pcts_cer_cons_str/pcts_cer_all,
+                            tag = "With predicted undetectable homologues",
+                            div = unique(cer_div$V2))
+cer_df_c2_str$div <- factor(cer_df_c2_str$div, levels = unique(cer_df_c2_str$div), ordered = TRUE)
+cer_df_c2_str$type="stringent"
+
+cer_df_c2_old <- data.frame(pct_found = pcts_cer_cons_old/pcts_cer_all,
+                            tag = "With predicted undetectable homologues",
+                            div = unique(cer_div$V2))
+cer_df_c2_old$div <- factor(cer_df_c2_old$div, levels = unique(cer_df_c2_old$div), ordered = TRUE)
+cer_df_c2_old$type="current"
+
+cer_df_c2_tot <- bind_rows(cer_df_c2, cer_df_c2_old, cer_df_c2_str)
+cer_df_c2_tot$type <- factor(cer_df_c2_tot$type, levels=c("relaxed", "current", "stringent"), ordered = TRUE)
+
+
+
+dros_df_c2 <- data.frame(pct_found = pcts_dros_cons/pcts_dros_all,
+                        tag = "With predicted undetectable homologues",
+                        div = unique(dros_div$V5))
+dros_df_c2$div <- factor(dros_df_c2$div, levels = unique(dros_df_c2$div), ordered = TRUE)
+dros_df_c2$type="relaxed"
+
+dros_df_c2_str <- data.frame(pct_found = pcts_dros_cons_str/pcts_dros_all,
+                            tag = "With predicted undetectable homologues",
+                            div = unique(dros_div$V5))
+dros_df_c2_str$div <- factor(dros_df_c2_str$div, levels = unique(dros_df_c2_str$div), ordered = TRUE)
+dros_df_c2_str$type="stringent"
+
+dros_df_c2_old <- data.frame(pct_found = pcts_dros_cons_old/pcts_dros_all,
+                            tag = "With predicted undetectable homologues",
+                            div = unique(dros_div$V5))
+dros_df_c2_old$div <- factor(dros_df_c2_old$div, levels = unique(dros_df_c2_old$div), ordered = TRUE)
+dros_df_c2_old$type="current"
+
+dros_df_c2_tot <- bind_rows(dros_df_c2, dros_df_c2_old, dros_df_c2_str)
+dros_df_c2_tot$type <- factor(dros_df_c2_tot$type, levels=c("relaxed", "current", "stringent"), ordered = TRUE)
 
 
 ####
 
-ver_df_c2 <- bind_rows(mutate(ver_phylo_df_p1, pct_found=1, tag="all genes"),ver_phylo_df_p1)
-
-ver_df_c2$div <- factor(ver_df_c2$div, levels = unique(ver_df_c2$div), ordered = TRUE)
 
 hist_ver_phyl <- ggplot() +
-  geom_bar(data = ver_df_c2, 
+  geom_bar(data = ver_df_c2_tot, 
            aes(x=div, 
                y=pct_found,
-               fill=tag),
+               fill=type,
+               alpha=type),
            stat="identity",
-           position = position_identity(), 
+           position = position_dodge(), 
            colour="black") +
-  scale_fill_manual(values = c("white", "#56B4E9")) +
+  scale_fill_manual(values = c("skyblue1", "dodgerblue2", "blue3")) +
   xlab("") +
   scale_x_discrete(labels=c(0,as.character(ver_df_c2$div)[1:(length(ver_df_c2$div)-1)])) +
-  geom_hline(aes(yintercept=mean(ver_df_c2[ver_df_c2$tag=="With predicted undetectable homologues", "pct_found"])),
-             colour="red",
-             size=2) +
   theme(text = element_text(size=14),
         axis.text = element_text(size=14, colour="black"),
         axis.text.x = element_text(angle=60, hjust=1),
@@ -508,25 +910,19 @@ hist_ver_phyl <- ggplot() +
   xlab("") +
   ylab("")
 
-
-dros_df_c2 <- bind_rows(mutate(dros_phylo_df_p1, pct_found=1, tag="all genes"),dros_phylo_df_p1)
-
-dros_df_c2$div <- factor(dros_df_c2$div, levels = unique(dros_df_c2$div), ordered = TRUE)
 
 hist_dros_phyl <- ggplot() +
-  geom_bar(data = dros_df_c2, 
+  geom_bar(data = dros_df_c2_tot, 
            aes(x=div, 
                y=pct_found,
-               fill=tag),
+               fill=type,
+               alpha=type),
            stat="identity",
-           position = position_identity(), 
+           position = position_dodge(), 
            colour="black") +
-  scale_fill_manual(values = c("white", "#E69F00")) +
+  scale_fill_manual(values = c("tan1", "darkorange", "darkorange4")) +
   xlab("") +
   scale_x_discrete(labels=c(0,as.character(dros_df_c2$div)[1:(length(dros_df_c2$div)-1)])) +
-  geom_hline(aes(yintercept=mean(dros_df_c2[dros_df_c2$tag=="With predicted undetectable homologues", "pct_found"])),
-             colour="red",
-             size=2) +
   theme(text = element_text(size=14),
         axis.text = element_text(size=14, colour="black"),
         axis.text.x = element_text(angle=60, hjust=1),
@@ -540,24 +936,18 @@ hist_dros_phyl <- ggplot() +
 
 
 
-cer_df_c2 <- bind_rows(mutate(cer_phylo_df_p1, pct_found=1, tag="all genes"),cer_phylo_df_p1)
-
-cer_df_c2$div <- factor(cer_df_c2$div, levels = unique(cer_df_c2$div), ordered = TRUE)
-
 hist_cer_phyl <- ggplot() +
-  geom_bar(data = cer_df_c2, 
+  geom_bar(data = cer_df_c2_tot, 
            aes(x=div, 
                y=pct_found,
-               fill=tag),
+               fill=type,
+               alpha=type),
            stat="identity",
-           position = position_identity(), 
+           position = position_dodge(), 
            colour="black") +
-  scale_fill_manual(values = c("white", "#999999")) +
-  scale_x_discrete(labels=c(0,as.character(cer_df_c2$div)[1:(length(cer_df_c2$div)-1)])) +
-  geom_hline(aes(yintercept=mean(cer_df_c2[cer_df_c2$tag=="With predicted undetectable homologues", "pct_found"])),
-             colour="red",
-             size=2) +
+  scale_fill_manual(values = c("grey78", "grey41", "grey16")) +
   xlab("") +
+  scale_x_discrete(labels=c(0,as.character(cer_df_c2$div)[1:(length(cer_df_c2$div)-1)])) +
   theme(text = element_text(size=14),
         axis.text = element_text(size=14, colour="black"),
         axis.text.x = element_text(angle=60, hjust=1),
@@ -574,20 +964,102 @@ hist_cer_phyl <- ggplot() +
 #####
 
 complete_fig <- grid.arrange(hist_cer,
-                             hist_dros,
-                             hist_ver,
                              hist_cer_phyl,
+                             hist_dros,
                              hist_dros_phyl,
+                             hist_ver,
                              hist_ver_phyl,
-                             heights=c(0.5, 0.5),
-                             ncol=3,
-                             nrow=2)
+                             heights=c(0.3, 0.3, 0.3),
+                             widths=c(0.65, 0.35),
+                             ncol=2,
+                             nrow=3)
 
-ggsave(plot = complete_fig, "figures/Figure6-supplement_3.pdf", width=13, height = 7)
+ggsave(plot = complete_fig, "figures/Figure6-supplement_3A.pdf", width=9, height = 10)
 
 # stats
 
-all_3_ph <- bind_rows(ver_phylo_df_p1, dros_phylo_df_p1, cer_phylo_df_p1)
-ov_min_ph <- all_3_ph[which.min(all_3_ph$pct),]
-ov_max_ph <- all_3_ph[which.max(all_3_ph$pct),]
-avg_ph <- mean(all_3_ph$pct)
+summary(c(cer_df_c2_old$pct, dros_df_c2_old$pct, ver_df_c2_old$pct))
+summary(c(cer_df_c2$pct, dros_df_c2$pct, ver_df_c2$pct))
+
+summary(c(cer_df_c2_str$pct, dros_df_c2_str$pct[1:5], ver_df_c2_str$pct))
+summary(c(cer_df_c2_old$pct, dros_df_c2_old$pct[1:5], ver_df_c2_old$pct))
+
+
+
+#####
+
+cer_cur <- as.data.frame(table(cer_gp_oo_old$species))
+cer_cur$type="current"
+cer_rel <- as.data.frame(table(cer_gp_oo$species))
+cer_rel$type="relaxed"
+cer_str <- as.data.frame(table(cer_gp_oo_str$species))
+cer_str$type="stringent"
+
+cer_df <- bind_rows(cer_cur, cer_rel, cer_str)
+cer_df$type <- factor(cer_df$type, levels=c("relaxed", "current", "stringent"), ordered=TRUE)
+cer_df$Var1 <- as.character(cer_df$Var1)
+cer_df$Var1 <- paste(substr(cer_df$Var1, 1, 1), substr(unlist(strsplit(cer_df$Var1, split = "_"))[2*(1:length(cer_df$Var1))],1,3), sep='')
+cer_df$Var1 <- factor(cer_df$Var1, levels = sp1[which(sp1$tag=="yeast"), "speciesShort"], ordered = TRUE)
+cer_df$tag <- "yeast"
+cer_df <- arrange(cer_df, Var1)
+
+dros_cur <- as.data.frame(table(dros_gp_oo_old$species))
+dros_cur$type="current"
+dros_rel <- as.data.frame(table(dros_gp_oo$species))
+dros_rel$type="relaxed"
+dros_str <- as.data.frame(table(dros_gp_oo_str$species))
+dros_str$type="stringent"
+
+dros_df <- bind_rows(dros_cur, dros_rel, dros_str)
+dros_df$type <- factor(dros_df$type, levels=c("relaxed", "current", "stringent"), ordered=TRUE)
+dros_df$Var1 <- as.character(dros_df$Var1)
+dros_df$Var1 <- paste(substr(dros_df$Var1, 1, 1), substr(unlist(strsplit(dros_df$Var1, split = "_"))[2*(1:length(dros_df$Var1))],1,3), sep='')
+dros_df$Var1 <- factor(dros_df$Var1, levels = sp1[which(sp1$tag=="fruitfly"), "speciesShort"], ordered = TRUE)
+dros_df$tag <- "fly"
+dros_df <- arrange(dros_df, Var1)
+
+vert_cur <- as.data.frame(table(vert_gp_oo_old$species))
+vert_cur$type="current"
+vert_rel <- as.data.frame(table(vert_gp_oo$species))
+vert_rel$type="relaxed"
+vert_str <- as.data.frame(table(vert_gp_oo_str$species))
+vert_str$type="stringent"
+
+vert_df <- bind_rows(vert_cur, vert_rel, vert_str)
+vert_df$type <- factor(vert_df$type, levels=c("relaxed", "current", "stringent"), ordered=TRUE)
+vert_df$Var1 <- as.character(vert_df$Var1)
+vert_df$Var1 <- paste(substr(vert_df$Var1, 1, 1), substr(unlist(strsplit(vert_df$Var1, split = "_"))[2*(1:length(vert_df$Var1))],1,3), sep='')
+vert_df$Var1 <- factor(vert_df$Var1, levels = sp1[which(sp1$tag=="human"), "speciesShort"], ordered = TRUE)
+vert_df$tag <- "human"
+vert_df <- arrange(vert_df, Var1)
+
+all_df <- bind_rows(cer_df, dros_df, vert_df)
+all_df$tag <- factor(all_df$tag, levels=c("yeast", "fly", "human"), ordered=TRUE)
+
+all_df$Var1 <- factor(all_df$Var1, levels=unique(all_df$Var1), ordered=TRUE)
+
+
+hist_plot <- ggplot() +
+  geom_bar(data = all_df, 
+           aes(x=Var1, 
+               y=Freq,
+               fill=tag,
+               alpha=type),
+           position="dodge",
+           stat="identity") +
+  scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9")) +
+  scale_alpha_manual(values=c(0.3,0.7,1)) +
+  theme_bw() +
+  theme(text = element_text(size=16),
+        axis.text = element_text(size=14, colour="black"),
+        axis.text.x = element_text(angle=60, hjust=1),
+        axis.title = element_text(size=16),
+        legend.text = element_text(size=14),
+        legend.title = element_blank(),
+        legend.key.height = unit(1.4, "lines"),
+        legend.position = "none") +
+  xlab("") +
+  ylab("Total # of genes in conserved micro-synteny regions") +
+  facet_wrap(~tag, scales="free", dir = "h", drop=TRUE)
+
+ggsave(plot = hist_plot, "figures/Figure6-supplement_3B.pdf", width=12, height = 4)

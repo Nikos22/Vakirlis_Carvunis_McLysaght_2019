@@ -66,6 +66,7 @@ cer_orphan <- melt(cer_sim,
 cer_orphan <- filter(cer_orphan, value==FALSE) %>%
   select(-value)
 colnames(cer_orphan) <- c("Gene_focal", "species")
+cer_orphan$species <- as.character(cer_orphan$species)
 
 cer_synt <- select(cer_synt, -Gene_ID)
 cer_gp_oo <- melt(cer_synt,
@@ -74,6 +75,8 @@ cer_gp_oo <- melt(cer_synt,
 cer_gp_oo <- filter(cer_gp_oo, value==TRUE) %>%
   select(-value)
 colnames(cer_gp_oo) <- c("Gene_focal", "species")
+cer_gp_oo$species <- as.character(cer_gp_oo$species)
+
 ###
 vert_sim <- select(vert_sim, -Gene_ID)
 vert_orphan <- melt(vert_sim,
@@ -82,6 +85,7 @@ vert_orphan <- melt(vert_sim,
 vert_orphan <- filter(vert_orphan, value==FALSE) %>%
   select(-value)
 colnames(vert_orphan) <- c("Gene_focal", "species")
+vert_orphan$species <- as.character(vert_orphan$species)
 
 vert_synt <- select(vert_synt, -Gene_ID)
 vert_gp_oo <- melt(vert_synt,
@@ -90,6 +94,8 @@ vert_gp_oo <- melt(vert_synt,
 vert_gp_oo <- filter(vert_gp_oo, value==TRUE) %>%
   select(-value)
 colnames(vert_gp_oo) <- c("Gene_focal", "species")
+vert_gp_oo$species <- as.character(vert_gp_oo$species)
+
 ###
 dros_sim <- select(dros_sim, -Gene_ID)
 dros_orphan <- melt(dros_sim,
@@ -98,6 +104,8 @@ dros_orphan <- melt(dros_sim,
 dros_orphan <- filter(dros_orphan, value==FALSE) %>%
   select(-value)
 colnames(dros_orphan) <- c("Gene_focal", "species")
+dros_orphan$species <- as.character(dros_orphan$species)
+
 
 dros_synt <- select(dros_synt, -Gene_ID)
 dros_gp_oo <- melt(dros_synt,
@@ -106,6 +114,7 @@ dros_gp_oo <- melt(dros_synt,
 dros_gp_oo <- filter(dros_gp_oo, value==TRUE) %>%
   select(-value)
 colnames(dros_gp_oo) <- c("Gene_focal", "species")
+dros_gp_oo$species <- as.character(dros_gp_oo$species)
 
 
 #### Calculate phylogeny-based proportions ####
@@ -223,6 +232,8 @@ cer_df_hist_all <- as.data.frame(table(cer_orphan$species)) %>%
   mutate(div = cer_div_d[match(species, cer_div_d$species), "Divergence_time"]) %>%
   arrange(div)
 
+cer_df_hist_all <- cer_df_hist_all[match(cer_df_hist_synt$species, cer_df_hist_all$species), ]
+
 cer_div_jitter <- jitter(cer_df_hist_synt$div, factor=5)
 
 
@@ -240,6 +251,8 @@ ver_df_hist_all <- as.data.frame(table(vert_orphan$species)) %>%
   mutate(div = vert_div_d[match(species, vert_div_d$species), "Divergence_time"]) %>%
   arrange(div)
 
+ver_df_hist_all <- ver_df_hist_all[match(ver_df_hist_synt$species, ver_df_hist_all$species), ]
+
 
 
 dros_df_hist_synt <- sp1 %>%
@@ -253,9 +266,12 @@ dros_df_hist_all <- as.data.frame(table(dros_orphan$species)) %>%
   mutate(pct = ((Freq)/dros_div_d$total_genes_checked),
          sep = sqrt((pct*(1-pct))/dros_div_d$total_genes_checked)) %>%
   dplyr::rename(species=Var1) %>%
-  mutate(div = dros_div_d[match(species, dros_div_d$species), "Divergence_time"]) %>%
+  mutate(species=as.character(species),
+         div = dros_div_d[match(species, dros_div_d$species), "Divergence_time"]) %>%
   arrange(div)
 
+dros_df_hist_all <- dros_df_hist_all[match(dros_df_hist_synt$species, dros_df_hist_all$species), ]
+  
 dros_div_jitter <- jitter(dros_df_hist_synt$div, factor=5)
 
 
@@ -494,7 +510,7 @@ complete_fig <- grid.arrange(cer_hist_sep_pl,
                              ncol=3,
                              nrow=2)
 
-ggsave(plot = complete_fig, "figures/Figure6.pdf", width=13, height = 8)
+ggsave(plot = complete_fig, "figures/Figure6.pdf", width=13, height = 6)
 
 # stats
 
@@ -743,7 +759,7 @@ complete_fig <- grid.arrange(cer_hist_sep_pl,
                              hist_cer,
                              hist_dros,
                              hist_ver,
-                             heights=c(0.5, 0.5),
+                             heights=c(0.35, 0.5),
                              ncol=3,
                              nrow=2)
 
