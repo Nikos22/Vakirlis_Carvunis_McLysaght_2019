@@ -32,7 +32,6 @@
 "fruitfly","Bombyx_mori","Bmor",283,0.01,1e-18,5896633,16,32,5,53,2819,"13929"
 "fruitfly","Tribolium_castaneum","Tcas",309,0.01,1e-16,11414197,20,33,6,59,2503,"13929"
 "fruitfly","Apis_mellifera","Amel",325,0.01,1e-22,15287002,11,18,2,31,2845,"13929"
-"fruitfly","Caenorhabditis_elegans","Cele",743,0.01,1e-28,15570484,0,8,2,10,4739,"13929"
 "human","Pan_troglodytes","Ptro",6.6,1e-04,1e-24,26542931,7139,213,1,7353,47,"19892"
 "human","Gorilla_gorilla","Ggor",9,0.001,1e-24,23410691,6683,236,3,6922,41,"19892"
 "human","Mus_musculus","Mmus",88,0.001,1e-09,27776671,4462,174,8,4644,299,"19892"
